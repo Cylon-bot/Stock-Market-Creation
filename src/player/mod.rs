@@ -3,4 +3,7 @@ enum OrderType {
     Buy,
 }
 
-struct Player {}
+struct Player {
+    money: f64,
+    current_position_type: OrderType,
+}
