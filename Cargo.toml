@@ -1,5 +1,5 @@
 [package]
-name = "Stock-Market-Creation"
+name = "stock_market_creation"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,7 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
+serde = { version = "1.0.203", features = ["derive"] }
+serde_yaml = "0.9.34+deprecated"
+sqlite = "0.36.0"
+thiserror = "1.0.61"

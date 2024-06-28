@@ -1,9 +1,11 @@
 use rand::Rng;
+
+#[derive(Debug)]
 enum OrderType {
     Sell,
     Buy,
 }
-
+#[derive(Debug)]
 pub struct Player {
     money: f64,
     current_position_type: OrderType,
@@ -18,7 +20,7 @@ impl Player {
         probability_of_taking_trade: f32,
     ) -> Player {
         let mut rng = rand::thread_rng();
-        let random: u8 = rng.gen_range(0..1);
+        let random: u8 = rng.gen_range(0..2);
         let current_position_type = match random {
             0 => OrderType::Buy,
             1 => OrderType::Sell,
