@@ -10,6 +10,5 @@ async-trait = "0.1.74"
 rand = "0.8.5"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_yaml = "0.9.34+deprecated"
-sqlite = "0.36.0"
-sqlx = { version = "0.7.3", default-features = false, features = ["macros", "runtime-tokio", "tls-rustls", "postgres", "chrono", "uuid"] }
+sqlx = { version = "0.7.4", default-features = false, features = ["macros", "runtime-tokio", "tls-rustls", "postgres", "chrono", "uuid"] }
 thiserror = "1.0.61"
