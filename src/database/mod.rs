@@ -1,8 +1,10 @@
+use std::path::PathBuf;
+
 use async_trait::async_trait;
 use thiserror::Error;
 
 mod postgres_connection;
-
+pub use postgres_connection::{PgError, PgState};
 #[derive(Debug, Error)]
 pub enum DatabaseError {
     #[error(transparent)]
@@ -13,12 +15,26 @@ pub enum StateTransaction<'pg> {
     /// Postgres implementation.
     Postgres(postgres_connection::PgTransaction<'pg>),
 }
+
+#[derive(Debug)]
 pub struct Candle {
     id: i32,
     open: f64,
     close: f64,
     high: f64,
     low: f64,
+}
+
+impl Candle {
+    pub fn new(id: i32, open: f64, close: f64, high: f64, low: f64) -> Candle {
+        Candle {
+            id,
+            open,
+            close,
+            high,
+            low,
+        }
+    }
 }
 #[async_trait]
 pub trait Transaction {
@@ -31,12 +47,14 @@ pub trait Transaction {
 /// Allow reading into the database.
 #[async_trait]
 pub trait StateReader: Send + Sync {
-    /// Reads an object by its Cid, if any.
+    /// Initiates a transactionnal writer to the State.
+    async fn init_writer(&self) -> Result<StateTransaction, DatabaseError>;
+    /// Reads an object by its candle_id, if any.
     ///
     /// # Arguments
     ///
     /// * `candle_id` - The `candle id` to requests.
-    async fn read_candle_by_id(&self, candle_id: usize) -> Result<Option<Candle>, DatabaseError>;
+    async fn read_candle_by_id(&self, candle_id: i32) -> Result<Option<Candle>, DatabaseError>;
 }
 
 /// Allow writing into the database.
@@ -46,7 +64,7 @@ pub trait StateWriter {
     ///
     /// # Arguments
     ///
-    /// * `record_input` - A `RecordInput`, used to populate the record's data.
+    /// * `candle` - A `Candle`, used to represent a duration on a stock market
     async fn write_candle(&mut self, candle: Candle) -> Result<(), DatabaseError>;
 }
 
@@ -61,6 +79,15 @@ impl Transaction for StateTransaction<'_> {
     async fn rollback(self) -> Result<(), DatabaseError> {
         match self {
             StateTransaction::Postgres(tx) => tx.rollback().await,
+        }
+    }
+}
+
+#[async_trait]
+impl StateWriter for StateTransaction<'_> {
+    async fn write_candle(&mut self, candle: Candle) -> Result<(), DatabaseError> {
+        match self {
+            StateTransaction::Postgres(pg_tx) => pg_tx.write_candle(candle).await,
         }
     }
 }

@@ -1,4 +1,4 @@
-use super::{Candle, DatabaseError, StateTransaction, StateWriter, Transaction};
+use super::{Candle, DatabaseError, StateReader, StateTransaction, StateWriter, Transaction};
 use async_trait::async_trait;
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use thiserror::Error;
@@ -23,7 +23,7 @@ impl PgState {
     /// # Arguments
     ///
     /// * `url` - A postgres connection url to try to connect to.
-    pub async fn try_new(url: &str) -> Result<Self, PgError> {
+    pub async fn try_new(url: &str) -> Result<Self, DatabaseError> {
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .connect(url)
@@ -48,6 +48,41 @@ impl Transaction for PgTransaction<'_> {
         Ok(())
     }
 }
+
+#[async_trait]
+impl StateReader for PgState {
+    async fn init_writer(&self) -> Result<StateTransaction, DatabaseError> {
+        let tx = self.pool.begin().await.map_err(PgError::from)?;
+
+        Ok(StateTransaction::Postgres(PgTransaction(tx)))
+    }
+
+    async fn read_candle_by_id(&self, candle_id: i32) -> Result<Option<Candle>, DatabaseError> {
+        let candle = sqlx::query!(
+            r#"
+            SELECT * FROM M1
+            WHERE candle_id = $1;
+        "#,
+            candle_id
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .map(|row_opt| {
+            row_opt.map(|row| {
+                Candle::new(
+                    row.candle_id,
+                    row.open.expect("every candle needs an open"),
+                    row.close.expect("every candle needs an close"),
+                    row.high.expect("every candle needs an high"),
+                    row.low.expect("every candle needs an low"),
+                )
+            })
+        })
+        .map_err(PgError::from)?;
+        Ok(candle)
+    }
+}
+
 #[async_trait]
 impl StateWriter for PgTransaction<'_> {
     async fn write_candle(&mut self, candle: Candle) -> Result<(), DatabaseError> {
