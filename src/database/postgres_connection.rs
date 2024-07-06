@@ -97,7 +97,7 @@ impl StateWriter for PgTransaction<'_> {
             candle.high,
             candle.low,
         )
-        .fetch_one(&mut *self.0)
+        .execute(&mut *self.0)
         .await
         .map_err(PgError::from)?;
 
