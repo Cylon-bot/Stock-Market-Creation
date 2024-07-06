@@ -18,7 +18,7 @@ Imagine if you could test your strategy not on 2 , 5, or even 20 years of data b
 
 That's the idea of this project made in Rust! 
 
-## Efficacity of this generate market database
+## Efficacity of this generated market databases
 
 If I perform well of this generate market database, do that assure me reward on the real market ? YES OF COURSE, BUY MY FORMATION, ITS 100% SURE (wink wink, telegram scamer).... no of course not and for 2 reasons:
 - This projet is an experiment, and experiment can fail !
