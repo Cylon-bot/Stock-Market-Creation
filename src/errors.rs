@@ -1,4 +1,4 @@
-use crate::database;
+use crate::{database, tools};
 
 use std::env::{self, VarError};
 use thiserror::Error;
@@ -11,4 +11,6 @@ pub enum MainProcessError {
     EnvError(#[from] VarError),
     #[error(transparent)]
     DatabaseError(#[from] DatabaseError),
+    #[error(transparent)]
+    ConfError(#[from] tools::yaml_connection::YamlError),
 }

@@ -72,9 +72,9 @@ impl StateReader for PgState {
                 Candle::new(
                     row.candle_id,
                     row.open.expect("every candle needs an open"),
-                    row.close.expect("every candle needs an close"),
-                    row.high.expect("every candle needs an high"),
-                    row.low.expect("every candle needs an low"),
+                    row.close.expect("every candle needs a close"),
+                    row.high.expect("every candle needs a high"),
+                    row.low.expect("every candle needs a low"),
                 )
             })
         })
