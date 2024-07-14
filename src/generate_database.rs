@@ -1,10 +1,10 @@
 use crate::{
     database::{self, Candle, PgState, StateReader, StateWriter, Transaction},
     errors::MainProcessError,
-    player,
+    market,
     tools::{DatabaseGenerationConfiguration, YamlFile},
 };
-use player::Player;
+use market::Player;
 use std::env;
 
 pub async fn generate_database() -> Result<(), MainProcessError> {
