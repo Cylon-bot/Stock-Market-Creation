@@ -1,10 +1,8 @@
 name_database: "test"
 lower_time_frame: M1
 
-probability_of_buying: 0.33
-probability_of_selling: 0.33
-probability_of_doing_nothing: 0.33
+probability_of_buying: 0.05
+probability_of_selling: 0.05
+probability_of_doing_nothing: 0.9
 
 number_of_player: 1000
-mean_of_volume: 1000000
-standard_deviation: 100000
