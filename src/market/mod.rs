@@ -3,26 +3,26 @@ use thiserror::Error;
 mod player;
 
 #[derive(Debug, Error)]
-pub enum PlayerError {}
-
+pub enum MarketError {}
+#[derive(Debug)]
+pub struct PendingBuyOrder {
+    shares_numbers: i64,
+    wanted_price: (f64, f64),
+}
+#[derive(Debug)]
+pub struct PendingSellOrder {
+    shares_numbers: i64,
+    wanted_price: f64,
+}
 #[derive(Debug)]
 pub struct Player {
     money: f64,
 
-    probability_of_taking_share: f64,
+    probability_of_buying: f64,
+    probability_of_selling: f64,
+    probability_of_removing_pending_order: f64,
 
-    probability_of_retrieving_share: f64,
-    // percentage of share retrieved from a trade
-    amount_share_retrieved: f64,
-    // taken share on a trade
-    min_share_taken: i64,
-    max_share_taken: i64,
-
-    on_going_trades: Vec<Trade>,
-}
-
-#[derive(Debug)]
-pub struct Trade {
-    share_buying_price: f64,
-    share_numbers: f64,
+    number_of_shares: i64,
+    pending_buy_orders: Vec<PendingBuyOrder>,
+    pending_sell_orders: Vec<PendingSellOrder>,
 }

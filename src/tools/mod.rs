@@ -5,10 +5,10 @@ pub use yaml_connection::YamlFile;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct DatabaseGenerationConfiguration {
-    name_database: String,
-    lower_time_frame: String,
-    probability_of_buying: f64,
-    probability_of_selling: f64,
-    probability_of_doing_nothing: f64,
-    number_of_player: u64,
+    pub name_database: String,
+    pub lower_time_frame: String,
+    pub probability_of_buying: f64,
+    pub probability_of_selling: f64,
+    pub probability_of_removing_pending_order: f64,
+    pub number_of_player: u64,
 }
