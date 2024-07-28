@@ -16,13 +16,13 @@ pub struct PendingSellOrder {
 }
 #[derive(Debug)]
 pub struct Player {
-    money: f64,
+    pub money: f64,
 
-    probability_of_buying: f64,
-    probability_of_selling: f64,
-    probability_of_removing_pending_order: f64,
+    pub probability_of_buying: f64,
+    pub probability_of_selling: f64,
+    pub probability_of_removing_pending_order: f64,
 
-    number_of_shares: i64,
-    pending_buy_orders: Vec<PendingBuyOrder>,
-    pending_sell_orders: Vec<PendingSellOrder>,
+    pub number_of_shares: i64,
+    pub pending_buy_orders: Vec<PendingBuyOrder>,
+    pub pending_sell_orders: Vec<PendingSellOrder>,
 }

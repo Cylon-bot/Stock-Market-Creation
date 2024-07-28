@@ -1,13 +1,17 @@
+use rand::{thread_rng, Rng};
+
+use crate::tools::mathematical::is_within_interval;
+
 use super::{MarketError, PendingBuyOrder, PendingSellOrder, Player};
 
 impl Player {
-    pub fn try_new(
+    pub fn new(
         initial_money: f64,
         probability_of_buying: f64,
         probability_of_selling: f64,
         probability_of_removing_pending_order: f64,
-    ) -> Result<Player, MarketError> {
-        Ok(Player {
+    ) -> Player {
+        Player {
             money: initial_money,
             probability_of_buying,
             probability_of_selling,
@@ -15,7 +19,28 @@ impl Player {
             number_of_shares: 0,
             pending_buy_orders: Vec::new(),
             pending_sell_orders: Vec::new(),
-        })
+        }
+    }
+    fn modify_pending_orders<T: Vec>(&self, orders: T) -> Vec<T> {
+        let mut rng = thread_rng();
+        let mut new_pending_orders = Vec::new();
+        for pending_buy_orders in orders {
+            let probability_number = rng.gen_range(0..=1);
+            let is_order_needs_to_be_removed = is_within_interval(
+                probability_number as f64,
+                0.,
+                self.probability_of_removing_pending_order,
+            );
+            if !is_order_needs_to_be_removed {
+                new_pending_orders.push(pending_buy_orders)
+            }
+        }
+        return new_pending_orders;
+    }
+    pub fn check_pending_orders(mut self) {
+        let mut new_buy_pending_orders = Vec::new();
+        self.pending_buy_orders = self.modify_pending_orders(self.pending_buy_orders);
+        self.pending_sell_orders = self.modify_pending_orders(self.pending_sell_orders);
     }
 }
 

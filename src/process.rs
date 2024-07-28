@@ -5,9 +5,18 @@ use crate::{
     tools::{DatabaseGenerationConfiguration, YamlFile},
 };
 use market::Player;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use std::env;
+fn process_player_turn() {}
 
-pub async fn generate_database() -> Result<(), MainProcessError> {
+pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainProcessError> {
+    let mut rng = thread_rng();
+    all_player.shuffle(&mut rng);
+    loop {
+        let playing_player = &mut all_player[0];
+        playing_player.all_player.shuffle(&mut rng);
+    }
     // let binding = env::var("DATABASE_URL")?;
     // let b: DatabaseGenerationConfiguration =
     //     YamlFile::try_new(env::var("YAML_CONF")?)?.file_content;
