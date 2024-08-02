@@ -36,9 +36,9 @@ impl Player {
                 new_pending_orders.push(pending_order.clone());
             }
         }
-        return new_pending_orders;
+        new_pending_orders
     }
-    pub fn check_pending_orders(mut self) {
+    pub fn check_pending_orders(&mut self) {
         self.pending_buy_orders = self.modify_pending_orders(&self.pending_buy_orders);
         self.pending_sell_orders = self.modify_pending_orders(&self.pending_sell_orders);
     }

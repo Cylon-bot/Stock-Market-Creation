@@ -15,7 +15,9 @@ pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainPr
     all_player.shuffle(&mut rng);
     loop {
         let playing_player = &mut all_player[0];
-        playing_player.all_player.shuffle(&mut rng);
+        playing_player.check_pending_orders();
+
+        all_player.shuffle(&mut rng);
     }
     // let binding = env::var("DATABASE_URL")?;
     // let b: DatabaseGenerationConfiguration =
