@@ -2,7 +2,7 @@ use rand::{thread_rng, Rng};
 
 use crate::tools::mathematical::is_within_interval;
 
-use super::{MarketError, PendingBuyOrder, PendingSellOrder, Player};
+use super::{MarketError, Order, PendingBuyOrder, PendingSellOrder, Player};
 
 impl Player {
     pub fn new(
@@ -21,10 +21,11 @@ impl Player {
             pending_sell_orders: Vec::new(),
         }
     }
-    fn modify_pending_orders<T: Vec>(&self, orders: T) -> Vec<T> {
+
+    fn modify_pending_orders<T: Order + Clone>(&self, orders: &Vec<T>) -> Vec<T> {
         let mut rng = thread_rng();
-        let mut new_pending_orders = Vec::new();
-        for pending_buy_orders in orders {
+        let mut new_pending_orders: Vec<T> = Vec::new();
+        for pending_order in orders {
             let probability_number = rng.gen_range(0..=1);
             let is_order_needs_to_be_removed = is_within_interval(
                 probability_number as f64,
@@ -32,15 +33,14 @@ impl Player {
                 self.probability_of_removing_pending_order,
             );
             if !is_order_needs_to_be_removed {
-                new_pending_orders.push(pending_buy_orders)
+                new_pending_orders.push(pending_order.clone());
             }
         }
         return new_pending_orders;
     }
     pub fn check_pending_orders(mut self) {
-        let mut new_buy_pending_orders = Vec::new();
-        self.pending_buy_orders = self.modify_pending_orders(self.pending_buy_orders);
-        self.pending_sell_orders = self.modify_pending_orders(self.pending_sell_orders);
+        self.pending_buy_orders = self.modify_pending_orders(&self.pending_buy_orders);
+        self.pending_sell_orders = self.modify_pending_orders(&self.pending_sell_orders);
     }
 }
 
@@ -59,7 +59,8 @@ impl PendingBuyOrder {
         })
     }
 }
-
+impl Order for PendingBuyOrder {}
+impl Order for PendingSellOrder {}
 impl PendingSellOrder {
     pub fn new(shares_numbers: i64, wanted_price: f64) -> Result<PendingSellOrder, MarketError> {
         Ok(PendingSellOrder {
