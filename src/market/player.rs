@@ -26,7 +26,7 @@ impl Player {
         let mut rng = thread_rng();
         let mut new_pending_orders: Vec<T> = Vec::new();
         for pending_order in orders {
-            let probability_number = rng.gen_range(0..=1);
+            let probability_number = rng.gen_range(0.0..=1.);
             let is_order_needs_to_be_removed = is_within_interval(
                 probability_number as f64,
                 0.,
@@ -38,9 +38,19 @@ impl Player {
         }
         new_pending_orders
     }
-    pub fn check_pending_orders(&mut self) {
+    pub fn removing_pending_orders(&mut self) {
         self.pending_buy_orders = self.modify_pending_orders(&self.pending_buy_orders);
         self.pending_sell_orders = self.modify_pending_orders(&self.pending_sell_orders);
+    }
+
+    pub fn selling_shares(&mut self) {
+        let mut rng = thread_rng();
+        let probability_number = rng.gen_range(0.0..=1.);
+        let sell_share: bool =
+            is_within_interval(probability_number as f64, 0., self.probability_of_selling);
+        if sell_share {
+            let number_of_share_to_sell = rng.gen_range(1..=self.number_of_shares);
+        }
     }
 }
 

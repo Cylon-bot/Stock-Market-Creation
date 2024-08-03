@@ -4,11 +4,13 @@ mod player;
 
 #[derive(Debug, Error)]
 pub enum MarketError {}
+
 #[derive(Debug, Clone)]
 pub struct PendingBuyOrder {
     shares_numbers: i64,
     wanted_price: (f64, f64),
 }
+
 #[derive(Debug, Clone)]
 pub struct PendingSellOrder {
     shares_numbers: i64,
@@ -28,3 +30,7 @@ pub struct Player {
 }
 
 pub trait Order {}
+
+pub struct Market {
+    market_price: f64,
+}

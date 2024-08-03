@@ -7,15 +7,16 @@ use crate::{
 use market::Player;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use std::env;
-fn process_player_turn() {}
 
 pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainProcessError> {
     let mut rng = thread_rng();
     all_player.shuffle(&mut rng);
     loop {
         let playing_player = &mut all_player[0];
-        playing_player.check_pending_orders();
+        playing_player.removing_pending_orders();
+        if playing_player.number_of_shares > 0 {
+            playing_player.selling_shares();
+        }
 
         all_player.shuffle(&mut rng);
     }
