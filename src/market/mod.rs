@@ -1,5 +1,7 @@
 use thiserror::Error;
+use uuid::Uuid;
 
+mod market;
 mod player;
 
 #[derive(Debug, Error)]
@@ -7,13 +9,13 @@ pub enum MarketError {}
 
 #[derive(Debug, Clone)]
 pub struct PendingBuyOrder {
-    shares_numbers: i64,
+    pub id: Uuid,
     wanted_price: (f64, f64),
 }
 
 #[derive(Debug, Clone)]
 pub struct PendingSellOrder {
-    shares_numbers: i64,
+    pub id: Uuid,
     wanted_price: f64,
 }
 #[derive(Debug)]
@@ -29,8 +31,12 @@ pub struct Player {
     pub pending_sell_orders: Vec<PendingSellOrder>,
 }
 
-pub trait Order {}
+pub trait Order {
+    fn get_id(&self) -> Uuid;
+}
 
 pub struct Market {
     market_price: f64,
+    queue_pending_buy_order: Vec<PendingBuyOrder>,
+    queue_pending_sell_order: Vec<PendingSellOrder>,
 }

@@ -1,7 +1,7 @@
 use crate::{
     database::{self, Candle, PgState, StateReader, StateWriter, Transaction},
     errors::MainProcessError,
-    market,
+    market::{self, Market},
     tools::{DatabaseGenerationConfiguration, YamlFile},
 };
 use market::Player;
@@ -11,12 +11,15 @@ use rand::thread_rng;
 pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainProcessError> {
     let mut rng = thread_rng();
     all_player.shuffle(&mut rng);
+    let market = Market::new(1.);
     loop {
         let playing_player = &mut all_player[0];
-        playing_player.removing_pending_orders();
+        let (buy_ids_to_remove, sell_ids_to_remove) = playing_player.removing_pending_orders();
+        
         if playing_player.number_of_shares > 0 {
-            playing_player.selling_shares();
+            playing_player.sell_shares(&market);
         }
+        playing_player.buy_shares(&market)?;
 
         all_player.shuffle(&mut rng);
     }
