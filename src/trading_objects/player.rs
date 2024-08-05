@@ -1,5 +1,3 @@
-use std::collections::btree_map::Range;
-
 use rand::{thread_rng, Rng};
 use uuid::Uuid;
 
@@ -16,6 +14,7 @@ impl Player {
     ) -> Player {
         Player {
             money: initial_money,
+            id: Uuid::new_v4(),
             probability_of_buying,
             probability_of_selling,
             probability_of_removing_pending_order,
@@ -63,7 +62,7 @@ impl Player {
             let wanted_price =
                 market.market_price + rng.gen_range(-0.01..=0.01) * market.market_price;
             for _ in 1..=number_of_share_to_sell {
-                let new_sell_order = PendingSellOrder::new(wanted_price);
+                let new_sell_order = PendingSellOrder::new(wanted_price, self.id);
                 new_sell_pending_orders_ids.push(new_sell_order.id);
                 self.pending_sell_orders.push(new_sell_order);
             }
@@ -83,7 +82,7 @@ impl Player {
                 market.market_price + rng.gen_range(-0.0..=0.01) * market.market_price,
             );
             for _ in 1..=number_of_share_to_buy {
-                let new_buy_order = PendingBuyOrder::try_new(wanted_price)?;
+                let new_buy_order = PendingBuyOrder::try_new(wanted_price, self.id)?;
                 new_buy_pending_orders_ids.push(new_buy_order.id);
                 self.pending_buy_orders.push(new_buy_order);
             }
@@ -93,7 +92,10 @@ impl Player {
 }
 
 impl PendingBuyOrder {
-    pub fn try_new(wanted_price: (f64, f64)) -> Result<PendingBuyOrder, MarketError> {
+    pub fn try_new(
+        wanted_price: (f64, f64),
+        id_player: Uuid,
+    ) -> Result<PendingBuyOrder, MarketError> {
         match wanted_price {
             x if x.1 < x.0 => panic!("wanted price needs to be an interval and the first number needs to be equal or inferior to the secode one"),
             _ => (),
@@ -101,6 +103,7 @@ impl PendingBuyOrder {
         Ok(PendingBuyOrder {
             wanted_price,
             id: Uuid::new_v4(),
+            id_player,
         })
     }
 }
@@ -115,10 +118,11 @@ impl Order for PendingSellOrder {
     }
 }
 impl PendingSellOrder {
-    pub fn new(wanted_price: f64) -> PendingSellOrder {
+    pub fn new(wanted_price: f64, id_player: Uuid) -> PendingSellOrder {
         PendingSellOrder {
             wanted_price,
             id: Uuid::new_v4(),
+            id_player,
         }
     }
 }

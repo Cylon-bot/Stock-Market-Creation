@@ -1,6 +1,6 @@
 mod database;
 mod errors;
-mod market;
+mod trading_objects;
 mod process;
 mod tools;
 
@@ -9,7 +9,7 @@ use rand::{thread_rng, Rng};
 use std::env;
 
 use crate::errors::MainProcessError;
-use market::Player;
+use trading_objects::Player;
 use process::generate_database;
 use tools::{DatabaseGenerationConfiguration, YamlFile};
 

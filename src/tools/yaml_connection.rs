@@ -1,6 +1,7 @@
 use serde::de::DeserializeOwned;
 use serde_yaml::{self};
 use thiserror::Error;
+
 #[derive(Debug)]
 pub struct YamlFile<T> {
     pub file_content: T,
