@@ -1,17 +1,17 @@
 mod database;
 mod errors;
-mod trading_objects;
 mod process;
 mod tools;
+mod trading_objects;
 
 use dotenv::dotenv;
 use rand::{thread_rng, Rng};
 use std::env;
 
 use crate::errors::MainProcessError;
-use trading_objects::Player;
 use process::generate_database;
 use tools::{DatabaseGenerationConfiguration, YamlFile};
+use trading_objects::Player;
 
 #[tokio::main]
 async fn main() -> Result<(), MainProcessError> {

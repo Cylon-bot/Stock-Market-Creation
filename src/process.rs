@@ -1,12 +1,13 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
     errors::MainProcessError,
     trading_objects::{self, Market},
 };
-use trading_objects::Player;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use trading_objects::Player;
+use uuid::Uuid;
 
 pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainProcessError> {
     let mut rng = thread_rng();
@@ -25,22 +26,20 @@ pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainPr
             .retain(|s| !sell_ids_to_remove.contains(&s.id));
 
         if playing_player.number_of_shares > 0 {
-            let sell_ids_to_add = playing_player.sell_shares(&market);
-            if !sell_ids_to_add.is_empty() {
-                let ids_set: HashSet<_> = sell_ids_to_add.iter().collect();
+            let sell_id_to_add = playing_player.sell_shares(&market);
+            if let Some(id) = sell_id_to_add {
                 for item in playing_player.pending_sell_orders.iter() {
-                    if ids_set.contains(&item.id) {
+                    if id == item.id {
                         market.queue_pending_sell_order.push(item.clone());
                     }
                 }
             }
         }
 
-        let buy_ids_to_add = playing_player.buy_shares(&market)?;
-        if !buy_ids_to_add.is_empty() {
-            let ids_set: HashSet<_> = buy_ids_to_add.iter().collect();
+        let buy_id_to_add = playing_player.buy_shares(&market)?;
+        if let Some(id) = buy_id_to_add {
             for item in playing_player.pending_buy_orders.iter() {
-                if ids_set.contains(&item.id) {
+                if id == item.id {
                     market.queue_pending_buy_order.push(item.clone());
                 }
             }

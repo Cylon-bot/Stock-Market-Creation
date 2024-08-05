@@ -1,4 +1,4 @@
-use crate::{database, trading_objects::MarketError, tools};
+use crate::{database, tools, trading_objects::MarketError};
 
 use std::env::VarError;
 use thiserror::Error;
