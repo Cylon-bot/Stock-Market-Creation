@@ -60,7 +60,7 @@ impl StateReader for PgState {
     async fn read_candle_by_id(&self, candle_id: i32) -> Result<Option<Candle>, DatabaseError> {
         let candle = sqlx::query!(
             r#"
-            SELECT * FROM M1
+            SELECT * FROM tick100
             WHERE candle_id = $1;
         "#,
             candle_id
@@ -68,15 +68,7 @@ impl StateReader for PgState {
         .fetch_optional(&self.pool)
         .await
         .map(|row_opt| {
-            row_opt.map(|row| {
-                Candle::new(
-                    row.candle_id,
-                    row.open.expect("every candle needs an open"),
-                    row.close.expect("every candle needs a close"),
-                    row.high.expect("every candle needs a high"),
-                    row.low.expect("every candle needs a low"),
-                )
-            })
+            row_opt.map(|row| Candle::new(row.candle_id, row.open, row.close, row.high, row.low))
         })
         .map_err(PgError::from)?;
         Ok(candle)
@@ -88,7 +80,7 @@ impl StateWriter for PgTransaction<'_> {
     async fn write_candle(&mut self, candle: Candle) -> Result<(), DatabaseError> {
         sqlx::query!(
             r#"
-                INSERT INTO M1 (candle_id, open, close, high, low)
+                INSERT INTO tick100 (candle_id, open, close, high, low)
                 VALUES ($1, $2, $3, $4, $5);
             "#,
             candle.id,

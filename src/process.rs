@@ -107,7 +107,7 @@ pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainPr
         }
         all_player.shuffle(&mut rng);
         println!("number of candle created: {}", candle_id);
-        if candle_id >= 1000000 {
+        if candle_id >= 50 {
             break;
         }
     }
