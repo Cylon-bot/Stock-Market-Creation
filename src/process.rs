@@ -19,9 +19,9 @@ pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainPr
     let mut all_tick = Vec::new();
     let binding = env::var("DATABASE_URL")?;
     let database_connector = PgState::try_new(&binding).await?;
-    let mut tx: database::StateTransaction = database_connector.init_writer().await?;
     let mut candle_id: i32 = 0;
     loop {
+        let mut tx: database::StateTransaction = database_connector.init_writer().await?;
         let playing_player = &mut all_player[0];
         let (buy_ids_to_remove, sell_ids_to_remove) = playing_player.removing_pending_orders();
 
@@ -106,11 +106,8 @@ pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainPr
             }
         }
         all_player.shuffle(&mut rng);
+        tx.commit().await?;
         println!("number of candle created: {}", candle_id);
-        if candle_id >= 50 {
-            break;
-        }
     }
-    tx.commit().await?;
     Ok(())
 }
