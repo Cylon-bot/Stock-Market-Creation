@@ -13,6 +13,7 @@ pub struct PendingBuyOrder {
     number_of_shares: u64,
     id_player: Uuid,
     wanted_price: (f64, f64),
+    alive: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -21,6 +22,7 @@ pub struct PendingSellOrder {
     number_of_shares: u64,
     id_player: Uuid,
     wanted_price: f64,
+    alive: bool,
 }
 #[derive(Debug)]
 pub struct Player {
@@ -41,7 +43,7 @@ pub trait Order {
 }
 
 pub struct Market {
-    market_price: f64,
+    pub market_price: f64,
     pub queue_pending_buy_order: Vec<PendingBuyOrder>,
     pub queue_pending_sell_order: Vec<PendingSellOrder>,
 }

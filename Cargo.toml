@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 async-trait = "0.1.74"
 dotenv = "0.15.0"
+ordered-float = "2.10.0"
 rand = "0.8.5"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_yaml = "0.9.34+deprecated"

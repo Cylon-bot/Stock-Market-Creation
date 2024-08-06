@@ -3,6 +3,8 @@ lower_time_frame: M1
 
 probability_of_buying: 0.05
 probability_of_selling: 0.05
-probability_of_removing_pending_order: 0.05
+probability_of_removing_pending_order: 0.8
 
 number_of_player: 1000
+
+number_of_market_share: 1000000

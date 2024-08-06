@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use thiserror::Error;
 
-mod postgres_connection;
+pub mod postgres_connection;
 #[derive(Debug, Error)]
 pub enum DatabaseError {
     #[error(transparent)]

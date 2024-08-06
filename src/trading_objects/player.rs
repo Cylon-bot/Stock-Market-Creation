@@ -11,6 +11,7 @@ impl Player {
         probability_of_buying: f64,
         probability_of_selling: f64,
         probability_of_removing_pending_order: f64,
+        number_of_shares: u64,
     ) -> Player {
         Player {
             money: initial_money,
@@ -18,7 +19,7 @@ impl Player {
             probability_of_buying,
             probability_of_selling,
             probability_of_removing_pending_order,
-            number_of_shares: 0,
+            number_of_shares,
             pending_buy_orders: Vec::new(),
             pending_sell_orders: Vec::new(),
         }
@@ -72,7 +73,7 @@ impl Player {
             self.pending_sell_orders.push(new_sell_order);
             return Option::Some(id_to_return);
         }
-        return Option::None;
+        Option::None
     }
     pub fn buy_shares(&mut self, market: &Market) -> Result<Option<Uuid>, MarketError> {
         let mut rng = thread_rng();
@@ -80,18 +81,25 @@ impl Player {
         let buy_share: bool =
             is_within_interval(probability_number as f64, 0., self.probability_of_buying);
         if buy_share {
-            let number_of_share_to_buy = rng.gen_range(1..=1000);
             let wanted_price = (
                 market.market_price - rng.gen_range(-0.0..=0.01) * market.market_price,
                 market.market_price + rng.gen_range(-0.0..=0.01) * market.market_price,
             );
+            let mut available_money = self.money;
+            for pending_buy_order in &self.pending_buy_orders {
+                available_money -=
+                    pending_buy_order.number_of_shares as f64 * pending_buy_order.wanted_price.1;
+            }
+            let maximum_number_of_share = (available_money / wanted_price.1) as u64;
+            let number_of_share_to_buy = rng.gen_range(1..=maximum_number_of_share);
+
             let new_buy_order =
                 PendingBuyOrder::try_new(wanted_price, self.id, number_of_share_to_buy)?;
             let id_to_return = new_buy_order.id;
             self.pending_buy_orders.push(new_buy_order);
             return Ok(Option::Some(id_to_return));
         }
-        return Ok(Option::None);
+        Ok(Option::None)
     }
 }
 
@@ -110,6 +118,7 @@ impl PendingBuyOrder {
             id: Uuid::new_v4(),
             id_player,
             number_of_shares,
+            alive: true,
         })
     }
 }
@@ -130,6 +139,7 @@ impl PendingSellOrder {
             id: Uuid::new_v4(),
             id_player,
             number_of_shares,
+            alive: true,
         }
     }
 }

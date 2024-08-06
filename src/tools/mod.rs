@@ -11,4 +11,5 @@ pub struct DatabaseGenerationConfiguration {
     pub probability_of_selling: f64,
     pub probability_of_removing_pending_order: f64,
     pub number_of_player: u64,
+    pub number_of_market_share: u64,
 }
