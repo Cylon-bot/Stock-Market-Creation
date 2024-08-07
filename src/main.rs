@@ -16,6 +16,7 @@ use trading_objects::Player;
 #[tokio::main]
 async fn main() -> Result<(), MainProcessError> {
     dotenv().ok();
+    env::set_var("RUST_BACKTRACE", "full");
     let mut rng = thread_rng();
     let configuration: DatabaseGenerationConfiguration =
         YamlFile::try_new(env::var("YAML_CONF")?)?.file_content;
@@ -30,7 +31,7 @@ async fn main() -> Result<(), MainProcessError> {
             configuration.probability_of_selling + rng.gen_range(-0.01..=0.01);
         let probability_of_removing_pending_order =
             configuration.probability_of_removing_pending_order + rng.gen_range(-0.01..=0.01);
-        let mut player_number_of_shares = 0;
+        let mut player_number_of_shares;
         if remaining_shares >= (max_shares as f64 * 0.002) as u64 {
             player_number_of_shares = rng.gen_range(0..=(max_shares as f64 * 0.002) as u64) as u64;
         } else {

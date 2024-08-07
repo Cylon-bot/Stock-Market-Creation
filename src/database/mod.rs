@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use ordered_float::OrderedFloat;
 use thiserror::Error;
 
 pub mod postgres_connection;
@@ -31,6 +32,24 @@ impl Candle {
             high,
             low,
         }
+    }
+    pub fn new_candle_from_tick(id: i32, all_tick: &[f64]) -> Candle {
+        let filtered: Vec<_> = all_tick
+            .iter()
+            .filter(|&&x| !x.is_nan())
+            .map(|&x| OrderedFloat(x))
+            .collect();
+        let max_value = filtered.iter().max();
+        let min_value = filtered.iter().min();
+        let max_value = max_value.map(|x| x.into_inner()).unwrap_or_default();
+        let min_value = min_value.map(|x| x.into_inner()).unwrap_or_default();
+        Candle::new(
+            id,
+            all_tick[0],
+            all_tick[all_tick.len() - 1],
+            max_value,
+            min_value,
+        )
     }
 }
 #[async_trait]

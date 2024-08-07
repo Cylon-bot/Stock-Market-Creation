@@ -6,7 +6,6 @@ use crate::{
     errors::MainProcessError,
     trading_objects::{self, Market},
 };
-use ordered_float::OrderedFloat;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::env;
@@ -15,7 +14,7 @@ use trading_objects::Player;
 pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainProcessError> {
     let mut rng = thread_rng();
     all_player.shuffle(&mut rng);
-    let mut market = Market::new(1.);
+    let mut market = Market::new(1000.);
     let mut all_tick = Vec::new();
     let binding = env::var("DATABASE_URL")?;
     let database_connector = PgState::try_new(&binding).await?;
@@ -60,22 +59,7 @@ pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainPr
             all_tick.push(market.market_price);
             if all_tick.len() == 100 {
                 candle_id += 1;
-                let filtered: Vec<_> = all_tick
-                    .iter()
-                    .filter(|&&x| !x.is_nan())
-                    .map(|&x| OrderedFloat(x))
-                    .collect();
-                let max_value = filtered.iter().max();
-                let min_value = filtered.iter().min();
-                let max_value = max_value.map(|x| x.into_inner()).unwrap_or_default();
-                let min_value = min_value.map(|x| x.into_inner()).unwrap_or_default();
-                let new_candle = Candle::new(
-                    candle_id,
-                    all_tick[0],
-                    all_tick[all_tick.len() - 1],
-                    max_value,
-                    min_value,
-                );
+                let new_candle = Candle::new_candle_from_tick(candle_id, &all_tick);
                 tx.write_candle(new_candle).await?;
                 all_tick.clear();
             }
@@ -85,22 +69,7 @@ pub async fn generate_database(mut all_player: Vec<Player>) -> Result<(), MainPr
             all_tick.push(market.market_price);
             if all_tick.len() == 100 {
                 candle_id += 1;
-                let filtered: Vec<_> = all_tick
-                    .iter()
-                    .filter(|&&x| !x.is_nan())
-                    .map(|&x| OrderedFloat(x))
-                    .collect();
-                let max_value = filtered.iter().max();
-                let min_value = filtered.iter().min();
-                let max_value = max_value.map(|x| x.into_inner()).unwrap_or_default();
-                let min_value = min_value.map(|x| x.into_inner()).unwrap_or_default();
-                let new_candle = Candle::new(
-                    candle_id,
-                    all_tick[0],
-                    all_tick[all_tick.len() - 1],
-                    max_value,
-                    min_value,
-                );
+                let new_candle = Candle::new_candle_from_tick(candle_id, &all_tick);
                 tx.write_candle(new_candle).await?;
                 all_tick.clear();
             }
